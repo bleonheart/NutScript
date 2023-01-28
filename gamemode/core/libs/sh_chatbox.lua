@@ -1,6 +1,6 @@
 nut.chat = nut.chat or {}
 nut.chat.classes = nut.char.classes or {}
-
+local PLUGIN = PLUGIN
 local DUMMY_COMMAND = {syntax = "<string text>", onRun = function() end}
 
 if (not nut.command) then
@@ -288,6 +288,12 @@ do
 					speaker:notifyLocalized("Global OOC is disabled on this server.")
 					return false
 				else
+					if PLUGIN.oocBans[speaker:SteamID()] then
+						speaker:notify("You have been banned from using OOC!!")
+			
+						return false
+					end
+			
 					local delay = nut.config.get("oocDelay", 10)
 
 					-- Only need to check the time if they have spoken in OOC chat before.
@@ -301,7 +307,6 @@ do
 							return false
 						end
 					end
-
 					-- Save the last time they spoke in OOC.
 					speaker.nutLastOOC = CurTime()
 				end
@@ -331,6 +336,9 @@ do
 					icon = "icon16/heart.png"
 				end
 
+				if (nut.config.get("oocLimit", 0) ~= 0) and (#text > nut.config.get("oocLimit", 0)) then
+					text = string.sub(text, 1, nut.config.get("oocLimit", 0)) .. "..."
+				end
 				icon = Material(hook.Run("GetPlayerIcon", speaker) or icon)
 
 				chat.AddText(icon, nut.chat.timestamp(true), Color(255, 50, 50), " [OOC] ", speaker, color_white, ": " .. text)
@@ -361,6 +369,9 @@ do
 				speaker.nutLastLOOC = CurTime()
 			end,
 			onChatAdd = function(speaker, text)
+				if (nut.config.get("oocLimit", 0) ~= 0) and (#text > nut.config.get("oocLimit", 0)) then
+					text = string.sub(text, 1, nut.config.get("oocLimit", 0)) .. "..."
+				end
 				chat.AddText(nut.chat.timestamp(false), Color(255, 50, 50), "[LOOC] ", nut.config.get("chatColor"), speaker:Name() .. ": " .. text)
 			end,
 			radius = function()
