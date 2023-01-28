@@ -1,5 +1,6 @@
 nut.chat = nut.chat or {}
 nut.chat.classes = nut.char.classes or {}
+local PLUGIN = PLUGIN
 
 local DUMMY_COMMAND = {syntax = "<string text>", onRun = function() end}
 
@@ -288,6 +289,11 @@ do
 					speaker:notifyLocalized("Global OOC is disabled on this server.")
 					return false
 				else
+					if PLUGIN.oocBans[speaker:SteamID()] then
+						speaker:notify("You have been banned from using OOC!!")
+			
+						return false
+					end
 					local delay = nut.config.get("oocDelay", 10)
 
 					-- Only need to check the time if they have spoken in OOC chat before.
